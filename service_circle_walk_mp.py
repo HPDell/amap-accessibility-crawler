@@ -160,8 +160,8 @@ class GaodeDirectionWalking(threading.Thread):
 
 if __name__ == "__main__":
     argv = sys.argv[1:]
-    range_size = 0
-    thread_num = 0
+    range_size = 51
+    thread_num = 4
     ''' 读取参数
     '''
     try:
@@ -180,7 +180,7 @@ if __name__ == "__main__":
                 except ValueError:
                     print("Please set correct thread num (int>0)")
                     sys.exit(1)
-            elif opt in ("-t", "--threads"):
+            elif opt in ("-r", "--range"):
                 try:
                     r = int(arg)
                     if r > 0:
@@ -190,11 +190,10 @@ if __name__ == "__main__":
                 except ValueError:
                     print("Please set correct thread num (int>0)")
                     sys.exit(1)
-                
     except getopt.GetoptError:
-        print('test.py -c <threads num> -r <range size>')
+        print('test.py -t <threads num> -r <range size>')
         sys.exit(2)
-    
+    # print(f"thread_num={thread_num},range_size={range_size}")
     if thread_num <= 1 or range_size <= 1:
         print('Args are not correct')
         sys.exit(1)
@@ -224,7 +223,7 @@ if __name__ == "__main__":
     key_lock = threading.Condition()
     key_provider = KeyProvider(key_queue, key_lock)
     key_provider.setDaemon(True)
-    key_provider.start()
+    # key_provider.start()
     ''' 开始爬虫
     '''
     log(u"爬取开始")
