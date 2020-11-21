@@ -222,8 +222,7 @@ if __name__ == "__main__":
     key_queue = queue.Queue()
     key_lock = threading.Condition()
     key_provider = KeyProvider(key_queue, key_lock)
-    key_provider.setDaemon(True)
-    # key_provider.start()
+    key_provider.start()
     ''' 开始爬虫
     '''
     log(u"爬取开始")
