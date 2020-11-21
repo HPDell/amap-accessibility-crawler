@@ -7,6 +7,8 @@ import threading
 import uuid
 import queue
 import transform
+import sys
+import getopt
 from tqdm import tqdm
 
 
@@ -157,8 +159,46 @@ class GaodeDirectionWalking(threading.Thread):
 
 
 if __name__ == "__main__":
-    range_size = 51
-    thread_num = 4
+    argv = sys.argv[1:]
+    range_size = 0
+    thread_num = 0
+    ''' 读取参数
+    '''
+    try:
+        opts, args = getopt.getopt(argv, "ht:r:", ["threads=", "range="])
+        for (opt, arg) in opts:
+            if opt == "-h":
+                print('test.py -c <threads num> -r <range size>')
+                sys.exit(2)
+            elif opt in ("-t", "--threads"):
+                try:
+                    t = int(arg)
+                    if t > 0:
+                        thread_num = t
+                    else:
+                        raise ValueError()
+                except ValueError:
+                    print("Please set correct thread num (int>0)")
+                    sys.exit(1)
+            elif opt in ("-t", "--threads"):
+                try:
+                    r = int(arg)
+                    if r > 0:
+                        range_size = r
+                    else:
+                        raise ValueError()
+                except ValueError:
+                    print("Please set correct thread num (int>0)")
+                    sys.exit(1)
+                
+    except getopt.GetoptError:
+        print('test.py -c <threads num> -r <range size>')
+        sys.exit(2)
+    
+    if thread_num <= 1 or range_size <= 1:
+        print('Args are not correct')
+        sys.exit(1)
+
     ''' 读取数据
     '''
     result_list = [f.split("_")[1] for f in os.listdir("./result")]
@@ -183,6 +223,7 @@ if __name__ == "__main__":
     key_queue = queue.Queue()
     key_lock = threading.Condition()
     key_provider = KeyProvider(key_queue, key_lock)
+    key_provider.setDaemon(True)
     key_provider.start()
     ''' 开始爬虫
     '''
