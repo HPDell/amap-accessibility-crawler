@@ -147,6 +147,8 @@ class GaodeDirectionWalking(threading.Thread):
                                     self.key = self.__rent_key__()
                                 elif (str(response["infocode"]) == "10016"):  # 服务器负载过高
                                     time.sleep(600)
+                                elif (str(response["infocode"]) == "10044"):  # 服务器负载过高
+                                    self.key = self.__rent_key__()
                                 else:
                                     retry = retry - 1
                             except Exception:
@@ -194,7 +196,7 @@ if __name__ == "__main__":
         print('test.py -t <threads num> -r <range size>')
         sys.exit(2)
     # print(f"thread_num={thread_num},range_size={range_size}")
-    if thread_num <= 1 or range_size <= 1:
+    if thread_num <= 0 or range_size <= 0:
         print('Args are not correct')
         sys.exit(1)
 
