@@ -106,7 +106,7 @@ class GaodeDirectionWalking(threading.Thread):
         # key_used = 0
         while not self.center_queue.empty():
             (pid, point) = self.center_queue.get()
-            self.pbar.set_description(desc=pid)
+            self.pbar.set_description(desc="{:>4d}".format(int(pid)))
             param_src = "{0},{1}".format(point[0], point[1])
             x0 = (point[0] - D * self.range_scan / 2, point[1] - D * self.range_scan / 2)
             save_file_name = './result/' + 'points' + '_' + str(pid) + '_wh' + '.txt'
@@ -135,7 +135,7 @@ class GaodeDirectionWalking(threading.Thread):
                                 if (str(response["infocode"]) == "10000"):
                                     flag = True
                                     path = response["route"]["paths"][0]
-                                    content = ",".join([point[0], point[1], path["duration"], path['distance']])
+                                    content = ",".join([str(item) for item in [point[0], point[1], path["duration"], path['distance']]])
                                     print(content, file=save_file, end="\n")
                                     retry = 0
                                 elif (str(response["infocode"]) == "10003"):  # 访问已超出日访问量
@@ -169,7 +169,7 @@ class GaodeDirectionWalking(threading.Thread):
 if __name__ == "__main__":
     argv = sys.argv[1:]
     range_size = 51
-    thread_num = 4
+    thread_num = 1
     ''' 读取参数
     '''
     try:
@@ -238,3 +238,4 @@ if __name__ == "__main__":
     for t in threads:
         t.setDaemon(True)
         t.start()
+        time.sleep(0.1)
