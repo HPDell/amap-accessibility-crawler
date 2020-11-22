@@ -35,8 +35,11 @@ class KeyProvider(threading.Thread):
         生成key
         """
         with open("./key.txt") as key_file:
+            count = 0
             for key in key_file:
                 self.key_queue.put(key.strip())
+                count = count + 1
+            log(f"读取到 {count} 个 key")
     
     def run(self):
         """
@@ -135,19 +138,22 @@ class GaodeDirectionWalking(threading.Thread):
                                     content = ",".join([point[0], point[1], path["duration"], path['distance']])
                                     print(content, file=save_file, end="\n")
                                     retry = 0
-                                elif (str(response["infocode"]) == "10001"):  # key不正确或过期
-                                    self.key = self.__rent_key__()
-                                elif (str(response["infocode"]) == "10002"):  # 没有权限使用相应的服务或者请求接口的路径拼写错误
-                                    self.key = self.__rent_key__()
                                 elif (str(response["infocode"]) == "10003"):  # 访问已超出日访问量
                                     self.key = self.__rent_key__()
                                 elif (str(response["infocode"]) == "10004"):  # 单位时间内访问过于频繁
                                     time.sleep(120)
-                                elif (str(response["infocode"]) == "10009"):  # 请求key与绑定平台不符
-                                    self.key = self.__rent_key__()
                                 elif (str(response["infocode"]) == "10016"):  # 服务器负载过高
                                     time.sleep(600)
-                                elif (str(response["infocode"]) == "10044"):  # 服务器负载过高
+                                elif (str(response["infocode"]) == "10044"):  # 账号日调用量超限
+                                    self.key = self.__rent_key__()
+                                elif (str(response["infocode"]) == "10001"):  # key不正确或过期
+                                    log(f"key {self.key} 错误 'key不正确或过期'")
+                                    self.key = self.__rent_key__()
+                                elif (str(response["infocode"]) == "10002"):  # 没有权限使用相应的服务或者请求接口的路径拼写错误
+                                    log(f"key {self.key} 错误 '没有权限使用相应的服务或者请求接口的路径拼写错误'")
+                                    self.key = self.__rent_key__()
+                                elif (str(response["infocode"]) == "10009"):  # 请求key与绑定平台不符
+                                    log(f"key {self.key} 错误 '请求key与绑定平台不符'")
                                     self.key = self.__rent_key__()
                                 else:
                                     retry = retry - 1
