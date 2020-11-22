@@ -107,7 +107,7 @@ class GaodeDirectionWalking(threading.Thread):
             param_src = "{0},{1}".format(point[0], point[1])
             x0 = (point[0] - D * self.range_scan / 2, point[1] - D * self.range_scan / 2)
             save_file_name = './result/' + 'points' + '_' + str(pid) + '_wh' + '.txt'
-            with open(save_file_name, mode="w") as save_file:
+            with open(save_file_name, mode="w", newline="\n") as save_file:
                 self.pbar.reset(total=(self.range_scan + 1)**2)
                 for i in range(self.range_scan + 1):
                     for j in range(self.range_scan + 1):
@@ -133,7 +133,7 @@ class GaodeDirectionWalking(threading.Thread):
                                     flag = True
                                     path = response["route"]["paths"][0]
                                     content = ",".join([point[0], point[1], path["duration"], path['distance']])
-                                    save_file.write(content + "\n")
+                                    print(content, file=save_file, end="\n")
                                     retry = 0
                                 elif (str(response["infocode"]) == "10001"):  # key不正确或过期
                                     self.key = self.__rent_key__()
