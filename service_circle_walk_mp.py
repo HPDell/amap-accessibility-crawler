@@ -135,7 +135,7 @@ class GaodeDirectionWalking(threading.Thread):
                                 if (str(response["infocode"]) == "10000"):
                                     flag = True
                                     path = response["route"]["paths"][0]
-                                    content = ",".join([str(item) for item in [point[0], point[1], path["duration"], path['distance']]])
+                                    content = ",".join([str(item) for item in [dst[0], dst[1], path["duration"], path['distance']]])
                                     print(content, file=save_file, end="\n")
                                     retry = 0
                                 elif (str(response["infocode"]) == "10003"):  # 访问已超出日访问量
