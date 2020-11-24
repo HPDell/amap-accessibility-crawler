@@ -110,6 +110,7 @@ class GaodeDirectionWalking(threading.Thread):
             param_src = "{0},{1}".format(point[0], point[1])
             x0 = (point[0] - D * self.range_scan / 2, point[1] - D * self.range_scan / 2)
             save_file_name = './result/' + 'points' + '_' + str(pid) + '_wh' + '.txt'
+            all_correct = True
             with open(save_file_name, mode="w", newline="\n") as save_file:
                 self.pbar.reset(total=(self.range_scan + 1)**2)
                 for i in range(self.range_scan + 1):
@@ -165,9 +166,13 @@ class GaodeDirectionWalking(threading.Thread):
                                 retry = retry - 1
                             time.sleep(0.02)
                         if (flag is not True):
+                            all_correct = False
                             log(f"({pid}) 第 ({i},{j}) 点爬取出错")
                         self.pbar.update(1)
-            log(pid + u"爬取完毕")
+            if all_correct:
+                log(pid + u"爬取完毕")
+            else:
+                log(pid + u"爬取完毕，但有错误。")
 
 
 if __name__ == "__main__":
