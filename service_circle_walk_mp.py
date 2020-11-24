@@ -152,10 +152,14 @@ class GaodeDirectionWalking(threading.Thread):
                                 elif (str(response["infocode"]) == "10002"):  # 没有权限使用相应的服务或者请求接口的路径拼写错误
                                     log(f"key {self.key} 错误 '没有权限使用相应的服务或者请求接口的路径拼写错误'")
                                     self.key = self.__rent_key__()
+                                elif (str(response["infocode"]) == "10007"):  # 请求key与绑定平台不符
+                                    log(f"key {self.key} 错误 '数字验证未通过'")
+                                    self.key = self.__rent_key__()
                                 elif (str(response["infocode"]) == "10009"):  # 请求key与绑定平台不符
                                     log(f"key {self.key} 错误 '请求key与绑定平台不符'")
                                     self.key = self.__rent_key__()
                                 else:
+                                    log(f"({pid}) 第 ({i},{j}) 点请求异常 {response['infocode']} ，使用 key {self.key}")
                                     retry = retry - 1
                             except Exception:
                                 retry = retry - 1
