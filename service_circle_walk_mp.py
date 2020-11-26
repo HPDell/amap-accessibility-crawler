@@ -173,6 +173,7 @@ class GaodeDirectionWalking(threading.Thread):
                 log(pid + u"爬取完毕")
             else:
                 log(pid + u"爬取完毕，但有错误。")
+        self.pbar.set_postfix_str("tasks has finished")
 
 
 if __name__ == "__main__":
