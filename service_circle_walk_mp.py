@@ -24,10 +24,11 @@ class KeyProvider(threading.Thread):
     """
     Key分发器
     """
-    def __init__(self, key_queue, key_lock):
+    def __init__(self, key_queue, key_lock, task_queue):
         threading.Thread.__init__(self)
         self.key_queue = key_queue  # type: queue.Queue
         self.key_lock = key_lock  # type: threading.Condition
+        self.task_queue = task_queue
         self.__read_key__()
     
     def __read_key__(self):
@@ -46,6 +47,8 @@ class KeyProvider(threading.Thread):
         执行线程
         """
         while True:
+            if self.task_queue.empty():
+                break
             if self.key_queue.empty():
                 now = datetime.datetime.now()
                 tomorrow = datetime.datetime.today() + datetime.timedelta(days=1)
@@ -239,7 +242,7 @@ if __name__ == "__main__":
     '''
     key_queue = queue.Queue()
     key_lock = threading.Condition()
-    key_provider = KeyProvider(key_queue, key_lock)
+    key_provider = KeyProvider(key_queue, key_lock, xcq_queue)
     key_provider.start()
     ''' 开始爬虫
     '''
