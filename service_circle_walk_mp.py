@@ -28,7 +28,7 @@ class KeyProvider(threading.Thread):
         threading.Thread.__init__(self)
         self.key_queue = key_queue  # type: queue.Queue
         self.key_lock = key_lock  # type: threading.Condition
-        self.task_queue = task_queue
+        self.task_finished = False
         self.__read_key__()
     
     def __read_key__(self):
@@ -47,7 +47,7 @@ class KeyProvider(threading.Thread):
         执行线程
         """
         while True:
-            if self.task_queue.empty():
+            if self.task_finished:
                 break
             if self.key_queue.empty():
                 now = datetime.datetime.now()
@@ -87,6 +87,7 @@ class GaodeDirectionWalking(threading.Thread):
         self.key_lock = key_lock  # type: threading.Condition
         self.key = ""
         self.pbar = tqdm(total=(range_scan + 1)**2, desc="", position=self.index)  # type: tqdm
+        self.finished = False
     
     def __rent_key__(self):  # type: str
         """
@@ -177,6 +178,7 @@ class GaodeDirectionWalking(threading.Thread):
             else:
                 log(pid + u"爬取完毕，但有错误。")
         self.pbar.set_postfix_str("tasks has finished")
+        self.finished = True
 
 
 if __name__ == "__main__":
@@ -243,6 +245,7 @@ if __name__ == "__main__":
     key_queue = queue.Queue()
     key_lock = threading.Condition()
     key_provider = KeyProvider(key_queue, key_lock, xcq_queue)
+    key_provider.setDaemon(True)
     key_provider.start()
     ''' 开始爬虫
     '''
@@ -252,3 +255,14 @@ if __name__ == "__main__":
         t.setDaemon(True)
         t.start()
         time.sleep(0.1)
+    try:
+        while True:
+            thread_finished = [x.finished for x in threads]
+            if all(thread_finished):
+                key_provider.task_finished = True
+                break
+    except KeyboardInterrupt:
+        log(u"爬取中止")
+    else:
+        log(u"爬取完成")
+    
