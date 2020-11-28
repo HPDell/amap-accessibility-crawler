@@ -112,10 +112,10 @@ class GaodeDirectionWalking(threading.Thread):
         # key_used = 0
         while not self.center_queue.empty():
             (pid, point) = self.center_queue.get()
-            self.pbar.set_description(desc="{:>4d}".format(int(pid)))
+            self.pbar.set_description(desc="{:0>5d}".format(int(pid)))
             param_src = "{0},{1}".format(point[0], point[1])
             x0 = (point[0] - D * self.range_scan / 2, point[1] - D * self.range_scan / 2)
-            save_file_name = './result/' + 'points' + '_' + str(pid) + '_wh' + '.txt'
+            save_file_name = './result/points_{:0>5d}_wh.txt'.format(int(pid))
             all_correct = True
             with open(save_file_name, mode="w", newline="\n") as save_file:
                 self.pbar.reset(total=(self.range_scan + 1)**2)
@@ -235,8 +235,7 @@ if __name__ == "__main__":
             if (index not in result_list):
                 xcq_queue.put((pl[0], (gcj02_pnt[0], gcj02_pnt[1])))
             else:
-                os.fstat
-                with open(f"./result/points_{index}_wh.txt") as exist_file:
+                with open("./result/points_{:0>5d}_wh.txt".format(int(index))) as exist_file:
                     lines = 0
                     for (index, line) in enumerate(exist_file):
                         lines = lines + 1
