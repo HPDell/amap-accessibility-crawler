@@ -52,6 +52,8 @@ class KeyProvider(threading.Thread):
             if self.key_queue.empty():
                 now = datetime.datetime.now()
                 tomorrow = datetime.datetime.today() + datetime.timedelta(days=1)
+                if now.hour() == 0 and now.minute() < 10:
+                    tomorrow = datetime.datetime.today()
                 resume = datetime.datetime.combine(tomorrow.date(), datetime.time(0, 10, 0, 0))
                 log(f"生产者：所有key已被消耗，于 {resume.strftime('%m-%d %H:%M:%S')} 重新读取")
                 # resume = now + datetime.timedelta(seconds=10)
