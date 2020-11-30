@@ -9,6 +9,7 @@ import queue
 import transform
 import sys
 import getopt
+import math
 from tqdm import tqdm
 
 
@@ -89,6 +90,7 @@ class GaodeDirectionWalking(threading.Thread):
         self.key_lock = key_lock  # type: threading.Condition
         self.key = ""
         self.pbar = tqdm(total=(range_scan + 1)**2, desc="", position=self.index)  # type: tqdm
+        self.format_str = "{0}"
         self.finished = False
     
     def __rent_key__(self):  # type: str
@@ -112,10 +114,10 @@ class GaodeDirectionWalking(threading.Thread):
         # key_used = 0
         while not self.center_queue.empty():
             (pid, point) = self.center_queue.get()
-            self.pbar.set_description(desc="{:0>5d}".format(int(pid)))
+            self.pbar.set_description(desc=self.format_str.format(int(pid)))
             param_src = "{0},{1}".format(point[0], point[1])
             x0 = (point[0] - D * self.range_scan / 2, point[1] - D * self.range_scan / 2)
-            save_file_name = './result/points_{:0>5d}_wh.txt'.format(int(pid))
+            save_file_name = ('./result/points_' + self.format_str + '_wh.txt').format(int(pid))
             all_correct = True
             with open(save_file_name, mode="w", newline="\n") as save_file:
                 self.pbar.reset(total=(self.range_scan + 1)**2)
@@ -226,6 +228,16 @@ if __name__ == "__main__":
     ''' 读取数据
     '''
     result_list = [f.split("_")[1].lstrip('0') for f in os.listdir("./result")]
+    format_str = "{0}"
+    with open("XCQ.txt") as xcq_file:
+        lines = 0
+        for (index, line) in enumerate(xcq_file):
+            lines = lines + 1
+        digits = 0
+        while lines > 0:
+            digits = digits + 1
+            lines = math.floor(lines / 10)
+        format_str = "{:0>" + str(digits) + "d}"
     xcq_queue = queue.Queue()
     with open("XCQ.txt") as xcq_file:
         for line_fp in xcq_file:
@@ -235,7 +247,7 @@ if __name__ == "__main__":
             if (index not in result_list):
                 xcq_queue.put((pl[0], (gcj02_pnt[0], gcj02_pnt[1])))
             else:
-                with open("./result/points_{:0>5d}_wh.txt".format(int(index))) as exist_file:
+                with open(("./result/points_" + format_str + "_wh.txt").format(int(index))) as exist_file:
                     lines = 0
                     for (index, line) in enumerate(exist_file):
                         lines = lines + 1
@@ -253,6 +265,7 @@ if __name__ == "__main__":
     log(u"爬取开始")
     threads = [GaodeDirectionWalking(i, xcq_queue, key_queue, range_size, key_lock) for i in range(thread_num)]
     for t in threads:
+        t.format_str = format_str
         t.setDaemon(True)
         t.start()
         time.sleep(0.1)
