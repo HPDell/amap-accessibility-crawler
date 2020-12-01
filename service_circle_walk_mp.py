@@ -140,7 +140,7 @@ class GaodeDirectionWalking(threading.Thread):
                                 #     save_file.write(url + "\n")
                                 #     retry = 0
                                 #### END
-                                response = json.load(urllib.request.urlopen(url))
+                                response = json.load(urllib.request.urlopen(url, timeout=60))
                                 if (str(response["infocode"]) == "10000"):
                                     flag = True
                                     path = response["route"]["paths"][0]
